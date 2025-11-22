@@ -1,7 +1,11 @@
-#ifndef LIGHT_N_SOUND_H
-#define LIGHT_N_SOUND_H
+// #ifndef LIGHT_N_SOUND_H
+// #define LIGHT_N_SOUND_H
 
-extern void Light(bool isGlow);
-extern void Sound(bool isBuzz);
+// // Pin definitions
+// #define EXTERNAL_LED_PIN 
+// #define BUZZER_PIN
 
-#endif
+// extern void Light(bool isGlow);
+// extern void Sound(bool isBuzz);
+
+// #endif

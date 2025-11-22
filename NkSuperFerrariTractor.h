@@ -1,6 +1,18 @@
 #ifndef NK_SUPER_FERRARI_TRACTOR_H
 #define NK_SUPER_FERRARI_TRACTOR_H
 
+// Debugging options
+#define DEBUG
+#ifdef DEBUG
+  #define DEBUG_IMU
+  //#define DEBUG_LTM
+#endif
+
+#include <Arduino.h>
+#include <hardwareSerial.h>
+#include <Wire.h>
+
+
 // IMU data packet
 struct IMUData {
     float accelX;   // Unit: g
@@ -19,10 +31,6 @@ struct LTMData {
     // boolValue    true    false *
     bool ir[8]; 
 };
-
-// Pin definitions
-#define EXTERNAL_LED_PIN 
-#define BUZZER_PIN
 
 
 
