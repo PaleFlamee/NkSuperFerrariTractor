@@ -25,15 +25,11 @@ void fetchLTMData(struct LTMData *pData) {
 }
 
 void fetchIMUData(struct IMUData *pData) {
-    Serial.println("Fetching IMU Data...");
+    #ifndef IMU_SERIAL
     Wire.beginTransmission(IMU);
-    Serial.println("Sent beginTransmission");
     Wire.write(IMU_ACC_X_REG);
-    Serial.println("Requested from ACC register");
-    Wire.endTransmission(true);
-    Serial.println("Ended transmission");
+    Wire.endTransmission(false);
     Wire.requestFrom(IMU, 6, true); // Request 6 bytes for Acceleration
-    Serial.println("Requested 6 bytes for ACC");
     // int16_t AcX = (Wire.read() << 8) | Wire.read();
     // int16_t AcY = (Wire.read() << 8) | Wire.read();
     // int16_t AcZ = (Wire.read() << 8) | Wire.read();
@@ -70,6 +66,9 @@ void fetchIMUData(struct IMUData *pData) {
     pData->gyroX = (float)GyX / 32768 * 2000; // Unit: °/s
     pData->gyroY = (float)GyY / 32768 * 2000; // Unit: °/s
     pData->gyroZ = (float)GyZ / 32768 * 2000; // Unit: °/s
+    #else
+    
+    #endif
 
     #ifdef DEBUG_IMU
     char buf[16];

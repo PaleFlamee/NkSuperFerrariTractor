@@ -4,9 +4,13 @@
 // Debugging options
 #define DEBUG
 #ifdef DEBUG
-  #define DEBUG_IMU
+  //#define DEBUG_IMU
   //#define DEBUG_LTM
+  #define DEBUG_MOTOR
 #endif
+
+//JY61P selection
+#define IMU_SERIAL
 
 #include <Arduino.h>
 #include <hardwareSerial.h>

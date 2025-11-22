@@ -1,4 +1,6 @@
+#include "NkSuperFerrariTractor.h"
 
+#include "Motor.h"
 ///////////////////TB6612引脚接线///////////////////////////
 //直流电机----------TB6612丝印标识----------ArduinoUNO主板引脚
 //                     PWMA-----------------3
@@ -8,32 +10,33 @@
 //                     BIN1-----------------8
 //                     BIN2-----------------9
 //                     PWMB-----------------10
-//                     GND------------------GND
-//                     ADC------------------A0 (只有带TB6612带稳压模块版才有ADC测量电池电压功能)    
-//                     VM-------------------12V电池
-//                     VCC------------------5V  （使用带有稳压模块版时，接线变动如下：  5V---------5V  板子可向arduino供电）
-//                     GND------------------GND  
+//                     5V-------------------5V  --->Nope.
+//                     GND------------------GND --->Nope.
+//                     E1A
+//                     E1B
+//                     E2A
+//                     E2B
 //电机A正极-------------AO1
-//电机A负极-------------A02
-//电机B负极-------------BO2
+//电机A负极-------------AO2        A -> Left
+//电机B负极-------------BO2        B -> Right
 //电机B正极-------------BO1
-//                     GND-----------------GND
+//                     GND-----------------GND --->Nope.
 //直流电机----------TB6612丝印标识----------ArduinoUNO主板引脚
 
-//定义引脚名称
-#define PWMA 3  //3为模拟引脚，用于PWM控制
-#define AIN1 5
-#define AIN2 4
-#define PWMB 10  //10为模拟引脚，用于PWM控制
-#define BIN1 8
-#define BIN2 9
-#define STBY 7  //2、4、8、12、7为数字引脚，用于开关量控制
-#define Voltage A0 //使用模拟引脚
+///////////////////电源模块接线///////////////////////////
+//                     Vin+ ----------------BATT+12V
+//                     Vin- ----------------BATT-GND
+
+//                     Vout+ ---------------POWER+12V
+//                     Vout- ---------------POWER-GND
+
+
+
 
 int PwmA, PwmB;
 double V;
 
-void setup() {
+void MotorSetup() {
   //TB6612电机驱动模块控制信号初始化
   pinMode(AIN1, OUTPUT);//控制电机A的方向，(AIN1, AIN2)=(1, 0)为正转，(AIN1, AIN2)=(0, 1)为反转
   pinMode(AIN2, OUTPUT);
@@ -64,25 +67,25 @@ void setup() {
 **************************************************************************/
 void SetPWM(int motor, int pwm)
 {
-  if(motor==1&&pwm>=0)//motor=1代表控制电机A，pwm>=0则(AIN1, AIN2)=(1, 0)为正转
+  if(motor==MOTOR_LEFT&&pwm>=0)//motor=1代表控制电机A，pwm>=0则(AIN1, AIN2)=(1, 0)为正转
   {
     digitalWrite(AIN1, 1);
     digitalWrite(AIN2, 0);
     analogWrite(PWMA, pwm);
   }
-  else if(motor==1&&pwm<0)//motor=1代表控制电机A，pwm<0则(AIN1, AIN2)=(0, 1)为反转
+  else if(motor==MOTOR_LEFT&&pwm<0)//motor=1代表控制电机A，pwm<0则(AIN1, AIN2)=(0, 1)为反转
   {
     digitalWrite(AIN1, 0);
     digitalWrite(AIN2, 1);
     analogWrite(PWMA, -pwm);
   }
-  else if(motor==2&&pwm>=0)//motor=2代表控制电机B，pwm>=0则(BIN1, BIN2)=(0, 1)为正转
+  else if(motor==MOTOR_RIGHT&&pwm>=0)//motor=2代表控制电机B，pwm>=0则(BIN1, BIN2)=(0, 1)为正转
   {
     digitalWrite(BIN1, 0);
     digitalWrite(BIN2, 1);
     analogWrite(PWMB, pwm);
   }
-  else if(motor==2&&pwm<0)//motor=2代表控制电机B，pwm<0则(BIN1, BIN2)=(1, 0)为反转
+  else if(motor==MOTOR_RIGHT&&pwm<0)//motor=2代表控制电机B，pwm<0则(BIN1, BIN2)=(1, 0)为反转
   {
     digitalWrite(BIN1, 1);
     digitalWrite(BIN2, 0);
@@ -90,40 +93,40 @@ void SetPWM(int motor, int pwm)
   }
 }
 
-void loop() 
+void MotorLoop()
 {
-  SetPWM(1, 255);//电机AB同时满速正转
-  SetPWM(2, 255);
+  SetPWM(MOTOR_LEFT, 255);//电机AB同时满速正转
+  SetPWM(MOTOR_RIGHT, 255);
   V=analogRead(Voltage); //读取模拟引脚A0模拟量
   Serial.print(V*0.05371);  //对模拟量转换并通过串口输出
   Serial.println("V");
   delay(500);//正转3s
   
-//  SetPWM(1, 0);//电机AB停止
-//  SetPWM(2, 0);
-//  delay(1000);//停止1s
-//  
-//  SetPWM(1, 128);//电机AB同时半速正转
-//  SetPWM(2, 128);
-//  delay(3000);//半速正转3s
-//  
-//  SetPWM(1, 0);//电机AB停止
-//  SetPWM(2, 0);
-//  delay(1000);//停止1s
-//  
-//  SetPWM(1, -255);//电机AB同时满速反转
-//  SetPWM(2, -255);
-//  delay(3000);//反转3s
-//  
-//  SetPWM(1, 0);//电机AB停止
-//  SetPWM(2, 0);
-//  delay(1000);//停止1s
-//  
-//  SetPWM(1, 255);//电机A满速正转
-//  SetPWM(2, -255);//电机B满速反转
-//  delay(3000);//持续3s
-//  
-//  SetPWM(1, 0);//电机AB停止
-//  SetPWM(2, 0);
-//  delay(1000);//停止1s
+ SetPWM(1, 0);//电机AB停止
+ SetPWM(2, 0);
+ delay(1000);//停止1s
+ 
+ SetPWM(1, 128);//电机AB同时半速正转
+ SetPWM(2, 128);
+ delay(3000);//半速正转3s
+ 
+ SetPWM(1, 0);//电机AB停止
+ SetPWM(2, 0);
+ delay(1000);//停止1s
+ 
+ SetPWM(1, -255);//电机AB同时满速反转
+ SetPWM(2, -255);
+ delay(3000);//反转3s
+ 
+ SetPWM(1, 0);//电机AB停止
+ SetPWM(2, 0);
+ delay(1000);//停止1s
+ 
+ SetPWM(1, 255);//电机A满速正转
+ SetPWM(2, -255);//电机B满速反转
+ delay(3000);//持续3s
+ 
+ SetPWM(1, 0);//电机AB停止
+ SetPWM(2, 0);
+ delay(1000);//停止1s
 }

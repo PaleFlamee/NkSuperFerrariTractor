@@ -6,6 +6,7 @@
 
 #include "FetchData.h"
 #include "LightNSound.h"
+#include "Motor.h"
 
 // Timers
 #define LASTMILLIS(MILLIS) lastMillis ## MILLIS
@@ -13,8 +14,16 @@
 
 void setup() {
     Serial.begin(9600);
-    Serial.println("Ciallo World!");
+    Serial.print("Ciallo ");
     Wire.begin();
+    lightNSoundInit();
+    MotorSetup();
+    Serial.println("World!");
+    #ifdef DEBUG_MOTOR
+     Serial.println("Motor Test Start:");
+     MotorLoop();
+     Serial.println("Motor Test End.");
+    #endif
 }
 
 void loop(){
