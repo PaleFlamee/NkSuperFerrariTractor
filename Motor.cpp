@@ -23,18 +23,12 @@
 //                     GND-----------------GND --->Nope.
 //直流电机----------TB6612丝印标识----------ArduinoUNO主板引脚
 
-///////////////////电源模块接线///////////////////////////
+///////////////////POWER MODULE CONNECTION/////////////////////////
 //                     Vin+ ----------------BATT+12V
 //                     Vin- ----------------BATT-GND
 
 //                     Vout+ ---------------POWER+12V
 //                     Vout- ---------------POWER-GND
-
-
-
-
-int PwmA, PwmB;
-double V;
 
 void MotorSetup() {
   //TB6612电机驱动模块控制信号初始化
@@ -93,11 +87,11 @@ void SetPWM(int motor, int pwm)
   }
 }
 
-void MotorLoop()
+void MotorTest()
 {
   SetPWM(MOTOR_LEFT, 255);//电机AB同时满速正转
   SetPWM(MOTOR_RIGHT, 255);
-  V=analogRead(Voltage); //读取模拟引脚A0模拟量
+  double V=analogRead(Voltage); //读取模拟引脚A0模拟量
   Serial.print(V*0.05371);  //对模拟量转换并通过串口输出
   Serial.println("V");
   delay(500);//正转3s

@@ -21,7 +21,7 @@ void setup() {
     Serial.println("World!");
     #ifdef DEBUG_MOTOR
      Serial.println("Motor Test Start:");
-     MotorLoop();
+     MotorTest();
      Serial.println("Motor Test End.");
     #endif
 }
