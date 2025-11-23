@@ -2,15 +2,24 @@
 #define NK_SUPER_FERRARI_TRACTOR_H
 
 // Debugging options
-#define DEBUG
+#define DEBUG /*ADJUSTABLE*/
 #ifdef DEBUG
-  //#define DEBUG_IMU
-  //#define DEBUG_LTM
-  #define DEBUG_MOTOR
+  #define DEBUG_IMU /*ADJUSTABLE*/
+  #define DEBUG_LTM /*ADJUSTABLE*/
+  #define DEBUG_MOTOR /*ADJUSTABLE*/
+  #define DEBUG_LIGHT_SOUND /*ADJUSTABLE*/
 #endif
 
-//JY61P selection
-#define IMU_SERIAL
+// JY61P IIC / Serial selection
+// #define IMU_SERIAL /*ADJUSTABLE*/
+#ifdef IMU_SERIAL
+ #define LogSerial Softerial
+ #define ImuSerial Serial
+ #include <SoftwareSerial.h>
+ extern SoftwareSerial LogSerial;
+#else
+ #define LogSerial Serial
+#endif
 
 #include <Arduino.h>
 #include <hardwareSerial.h>
@@ -25,6 +34,9 @@ struct IMUData {
     float gyroX;    // Unit: degrees/sec
     float gyroY;    // Unit: degrees/sec
     float gyroZ;    // Unit: degrees/sec
+    float Row;      // Unit: degrees
+    float Pitch;    // Unit: degrees
+    float Yaw;      // Unit: degrees
 };
 
 // LTM data packet

@@ -25,3 +25,26 @@ void lightNSoundInit() {
     Light(false);
     Sound(false);
 }
+
+void lightNSoundTest() {
+    // Test Sound
+    Sound(true);
+    delay(500);
+    Sound(false);
+    delay(500);
+    // Test Light
+    Light(true);
+    delay(500);
+    Light(false);
+    delay(500);
+    // Test Sound
+    Sound(true);
+    delay(500);
+    Sound(false);
+    delay(500);
+    // Test Light
+    Light(true);
+    delay(500);
+    Light(false);
+    delay(500);
+}

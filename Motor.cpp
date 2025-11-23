@@ -50,7 +50,6 @@ void MotorSetup() {
   analogWrite(PWMB, 0);
 
  //初始化串口，用于输出电池电压
-  Serial.begin(9600);
   pinMode(Voltage,INPUT); //初始化作为输入端
 }
 
@@ -92,8 +91,8 @@ void MotorTest()
   SetPWM(MOTOR_LEFT, 255);//电机AB同时满速正转
   SetPWM(MOTOR_RIGHT, 255);
   double V=analogRead(Voltage); //读取模拟引脚A0模拟量
-  Serial.print(V*0.05371);  //对模拟量转换并通过串口输出
-  Serial.println("V");
+  LogSerial.print(V*0.05371);  //对模拟量转换并通过串口输出
+  LogSerial.println("V");
   delay(500);//正转3s
   
  SetPWM(1, 0);//电机AB停止
