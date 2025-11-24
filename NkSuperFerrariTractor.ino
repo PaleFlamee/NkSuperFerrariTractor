@@ -19,7 +19,7 @@
 void setup() {
     LogSerial.begin(9600);
     LogSerial.println();
-    LogSerial.println("--------------------------------");
+    LogSerial.println("-------------------------");
     LogSerial.print("Ciallo~(∠·ω< )⌒★ ");
     #ifdef IMU_SERIAL
      ImuSerial.begin(9600);
@@ -28,7 +28,7 @@ void setup() {
     lightNSoundInit();
     MotorSetup();
     LogSerial.println("World!");
-    LogSerial.println("--------------------------------");
+    LogSerial.println("-------------------------");
     delay(1000);
 
     #ifdef DEBUG_LIGHT_SOUND
