@@ -71,6 +71,7 @@ void loop(){
         #ifdef DEBUG_LTM
          fetchLTMData(&ltmData);
         #endif
+        LogSerial.println();
      }
     #endif
 }
