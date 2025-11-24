@@ -6,7 +6,7 @@
 #ifdef DEBUG
   #define DEBUG_IMU /*ADJUSTABLE*/
   #define DEBUG_LTM /*ADJUSTABLE*/
-  #define DEBUG_MOTOR /*ADJUSTABLE*/
+  //#define DEBUG_MOTOR /*ADJUSTABLE*/
   #define DEBUG_LIGHT_SOUND /*ADJUSTABLE*/
 #endif
 

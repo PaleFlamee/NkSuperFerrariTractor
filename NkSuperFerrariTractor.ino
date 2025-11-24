@@ -18,7 +18,8 @@
 
 void setup() {
     LogSerial.begin(9600);
-    LogSerial.print("Ciallo ");
+    LogSerial.println("--------------------------------");
+    LogSerial.print("Ciallo~(∠·ω< )⌒★ ");
     #ifdef IMU_SERIAL
      ImuSerial.begin(9600);
     #endif
@@ -26,6 +27,7 @@ void setup() {
     lightNSoundInit();
     MotorSetup();
     LogSerial.println("World!");
+    LogSerial.println("--------------------------------");
     delay(1000);
 
     #ifdef DEBUG_LIGHT_SOUND
@@ -63,7 +65,7 @@ void loop(){
         LASTMILLIS(500) = nowMilliis;
         #ifdef DEBUG_IMU
          #ifndef IMU_SERIAL
-          //fetchIMUData(&imuData);
+          fetchIMUData(&imuData);
          #endif
         #endif
         #ifdef DEBUG_LTM
