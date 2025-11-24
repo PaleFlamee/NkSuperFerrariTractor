@@ -157,11 +157,11 @@ void serialEvent(){// Hardware serial, also IMU serial
     LogSerial.print("GY: ");LogSerial.print(buf);LogSerial.print(" | ");
     dtostrf(pData->gyroZ, 8, 2, buf);
     LogSerial.print("GZ: ");LogSerial.print(buf);LogSerial.print(" | ");
-    dtostrf(pData->Row, 8, 2, buf);
+    dtostrf(pData->Row, 7, 2, buf);
     LogSerial.print("Roll: ");LogSerial.print(buf);LogSerial.print(" | ");
-    dtostrf(pData->Pitch, 8, 2, buf);
+    dtostrf(pData->Pitch, 7, 2, buf);
     LogSerial.print("Pitch: ");LogSerial.print(buf);LogSerial.print(" | ");
-    dtostrf(pData->Yaw, 8, 2, buf);
+    dtostrf(pData->Yaw, 7, 2, buf);
     LogSerial.print("Yaw: ");LogSerial.print(buf);LogSerial.print(" | ");
     #endif
  }
@@ -182,9 +182,7 @@ void fetchLTMData(struct LTMData *pData) {
     #ifdef DEBUG_LTM
     LogSerial.print("LTM IR States: ");
     for (int i = 0; i < 8; i++) {
-        LogSerial.print(pData->ir[i]);
-        LogSerial.print(" ");
-        if(pData->ir[i]==true){ {
+        if(pData->ir[i]==true) {
             LogSerial.print("■");
         } else {
             LogSerial.print("_");

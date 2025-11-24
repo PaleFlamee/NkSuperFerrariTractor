@@ -11,7 +11,7 @@
 #endif
 
 // JY61P IIC / Serial selection
-// #define IMU_SERIAL /*ADJUSTABLE*/
+// #define IMU_SERIAL /*ADJUSTABLE*/ //DO NOT ENABLE THIS UNLESS YOU KNOW WHAT YOU ARE DOING
 #ifdef IMU_SERIAL
  #define LogSerial Softerial
  #define ImuSerial Serial

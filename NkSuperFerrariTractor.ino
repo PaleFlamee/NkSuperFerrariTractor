@@ -18,6 +18,7 @@
 
 void setup() {
     LogSerial.begin(9600);
+    LogSerial.println();
     LogSerial.println("--------------------------------");
     LogSerial.print("Ciallo~(∠·ω< )⌒★ ");
     #ifdef IMU_SERIAL
