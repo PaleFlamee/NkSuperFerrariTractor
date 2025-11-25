@@ -1,125 +1,96 @@
 #include "NkSuperFerrariTractor.h"
 
 #include "Motor.h"
-///////////////////TB6612引脚接线///////////////////////////
-//直流电机----------TB6612丝印标识----------ArduinoUNO主板引脚
-//                     PWMA-----------------3
-//                     AIN2-----------------4
-//                     AIN1-----------------5
-//                     STBY-----------------7
-//                     BIN1-----------------8
-//                     BIN2-----------------9
-//                     PWMB-----------------10
-//                     5V-------------------5V  --->Nope.
-//                     GND------------------GND --->Nope.
-//                     ADC------------------A0
-//                     E1A
-//                     E1B
-//                     E2A
-//                     E2B
-//电机A正极-------------AO1
-//电机A负极-------------AO2        A -> Left
-//电机B负极-------------BO2        B -> Right
-//电机B正极-------------BO1
-//直流电机----------TB6612丝印标识----------ArduinoUNO主板引脚
 
-///////////////////POWER MODULE CONNECTION/////////////////////////
-//                     Vin+ ----------------BATT+12V
-//                     Vin- ----------------BATT-GND
+// MotorCtrlBoard   Arduino
+// PWMA             3
+// AIN2             4
+// AIN1             5
+// STBY             7
+// BIN1             8
+// BIN2             9
+// PWMB             10
+// 5V
+// GND
+// ADC              A0
+// E1A
+// E1B
+// E2A
+// E2B
 
-//                     Vout+ ---------------POWER+12V
-//                     Vout- ---------------POWER-GND
+// IN1   IN2
+//  0     0   Stop
+//  1     0   Forward
+//  0     1   Reverse
+//  1     1   Stop
 
 void MotorSetup() {
-  //TB6612电机驱动模块控制信号初始化
-  pinMode(AIN1, OUTPUT);//控制电机A的方向，(AIN1, AIN2)=(1, 0)为正转，(AIN1, AIN2)=(0, 1)为反转
-  pinMode(AIN2, OUTPUT);
-  pinMode(BIN1, OUTPUT);//控制电机B的方向，(BIN1, BIN2)=(0, 1)为正转，(BIN1, BIN2)=(1, 0)为反转
-  pinMode(BIN2, OUTPUT);
-  pinMode(PWMA, OUTPUT);//A电机PWM
-  pinMode(PWMB, OUTPUT);//B电机PWM
-  pinMode(STBY, OUTPUT);//TB6612FNG使能, 置0则所有电机停止, 置1才允许控制电机
-  
-  //初始化TB6612电机驱动模块
-  digitalWrite(AIN1, 1);
-  digitalWrite(AIN2, 0);
-  digitalWrite(BIN1, 1);
-  digitalWrite(BIN2, 0);
-  digitalWrite(STBY, 1);
-  analogWrite(PWMA, 0);
-  analogWrite(PWMB, 0);
-
- //初始化串口，用于输出电池电压
-  pinMode(Voltage,INPUT); //初始化作为输入端
-}
-
-/**************************************************************************
-函数功能：设置指定电机转速
-入口参数：指定电机motor，motor=1（2）代表电机A（B）； 指定转速pwm，大小范围为0~255，代表停转和满速
-返回  值：无
-**************************************************************************/
-void SetPWM(int motor, int pwm)
-{
-  if(motor==MOTOR_LEFT&&pwm>=0)//motor=1代表控制电机A，pwm>=0则(AIN1, AIN2)=(1, 0)为正转
-  {
-    digitalWrite(AIN1, 1);
+    pinMode(AIN1, OUTPUT);
+    pinMode(AIN2, OUTPUT);
+    pinMode(BIN1, OUTPUT);
+    pinMode(BIN2, OUTPUT);
+    pinMode(PWMA, OUTPUT);
+    pinMode(PWMB, OUTPUT);
+    pinMode(STBY, OUTPUT);
+    digitalWrite(AIN1, 0);// Stop motor Left
     digitalWrite(AIN2, 0);
-    analogWrite(PWMA, pwm);
-  }
-  else if(motor==MOTOR_LEFT&&pwm<0)//motor=1代表控制电机A，pwm<0则(AIN1, AIN2)=(0, 1)为反转
-  {
-    digitalWrite(AIN1, 0);
-    digitalWrite(AIN2, 1);
-    analogWrite(PWMA, -pwm);
-  }
-  else if(motor==MOTOR_RIGHT&&pwm>=0)//motor=2代表控制电机B，pwm>=0则(BIN1, BIN2)=(0, 1)为正转
-  {
-    digitalWrite(BIN1, 0);
-    digitalWrite(BIN2, 1);
-    analogWrite(PWMB, pwm);
-  }
-  else if(motor==MOTOR_RIGHT&&pwm<0)//motor=2代表控制电机B，pwm<0则(BIN1, BIN2)=(1, 0)为反转
-  {
-    digitalWrite(BIN1, 1);
+    digitalWrite(BIN1, 0);// Stop motor Right
     digitalWrite(BIN2, 0);
-    analogWrite(PWMB, -pwm);
-  }
+    digitalWrite(STBY, 1);// Enable motor
+    analogWrite(PWMA, 0);
+    analogWrite(PWMB, 0);
+  
+    pinMode(Voltage,INPUT);
 }
 
-void MotorTest()
-{
-  SetPWM(MOTOR_LEFT, 255);//电机AB同时满速正转
-  SetPWM(MOTOR_RIGHT, 255);
-  double V=analogRead(Voltage); //读取模拟引脚A0模拟量
-  LogSerial.print(V*0.05371);  //对模拟量转换并通过串口输出
-  LogSerial.println("V");
-  delay(500);//正转3s
-  
- SetPWM(1, 0);//电机AB停止
- SetPWM(2, 0);
- delay(1000);//停止1s
- 
- SetPWM(1, 128);//电机AB同时半速正转
- SetPWM(2, 128);
- delay(3000);//半速正转3s
- 
- SetPWM(1, 0);//电机AB停止
- SetPWM(2, 0);
- delay(1000);//停止1s
- 
- SetPWM(1, -255);//电机AB同时满速反转
- SetPWM(2, -255);
- delay(3000);//反转3s
- 
- SetPWM(1, 0);//电机AB停止
- SetPWM(2, 0);
- delay(1000);//停止1s
- 
- SetPWM(1, 255);//电机A满速正转
- SetPWM(2, -255);//电机B满速反转
- delay(3000);//持续3s
- 
- SetPWM(1, 0);//电机AB停止
- SetPWM(2, 0);
- delay(1000);//停止1s
+// God damn comment
+void SetPWM(enum MotorID motor, enum MotorDirection direction, unsigned int pwm){
+    if(motor == MotorLeft && direction == Forward)  {
+        digitalWrite(AIN1, 1);
+        digitalWrite(AIN2, 0);
+        analogWrite(PWMA, pwm);
+    }
+    else if(motor == MotorLeft && direction == Backward)  {
+        digitalWrite(AIN1, 0);
+        digitalWrite(AIN2, 1);
+        analogWrite(PWMA, pwm);
+    }
+    else if(motor == MotorRight && direction == Forward)  {
+        digitalWrite(BIN1, 1);
+        digitalWrite(BIN2, 0);
+        analogWrite(PWMB, pwm);
+    }
+    else if(motor == MotorRight && direction == Backward)  {
+        digitalWrite(BIN1, 0);
+        digitalWrite(BIN2, 1);
+        analogWrite(PWMB, pwm);
+    }
+}
+
+void MotorTest() {
+    double V = analogRead(Voltage);
+    LogSerial.print("Battery Voltage: ");
+    LogSerial.print(V * 0.05371);
+    LogSerial.println("V");
+    delay(1000);
+
+    LogSerial.println("Left Motor Forward, 1/4 speed, 1s");
+    SetPWM(MotorLeft, Forward, 64);
+    delay(1000);
+    SetPWM(MotorLeft, Forward, 0);
+
+    LogSerial.println("Left Motor Backward, 1/4 speed, 1s");
+    SetPWM(MotorLeft, Backward, 64);
+    delay(1000);
+    SetPWM(MotorLeft, Backward, 0);
+
+    LogSerial.println("Right Motor Forward, 1/4 speed, 1s");
+    SetPWM(MotorRight, Forward, 64);
+    delay(1000);
+    SetPWM(MotorRight, Forward, 0);
+
+    LogSerial.println("Left Motor Backward, 1/4 speed, 1s");
+    SetPWM(MotorRight, Backward, 64);
+    delay(1000);
+    SetPWM(MotorRight, Backward, 0);
 }

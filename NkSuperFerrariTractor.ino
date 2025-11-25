@@ -29,7 +29,7 @@ void setup() {
     MotorSetup();
     LogSerial.println("World!");
     LogSerial.println("-------------------------");
-    delay(1000);
+    delay(500);
 
     #ifdef DEBUG_LIGHT_SOUND
      LogSerial.println("Light and Sound Test Start:");

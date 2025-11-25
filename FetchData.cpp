@@ -94,6 +94,11 @@ void serialEvent(){// Hardware serial, also IMU serial
     // int16_t AcY = (Wire.read() << 8) | Wire.read();
     // int16_t AcZ = (Wire.read() << 8) | Wire.read();
     // Don't know why the code above does not work properly, change to the code below
+    // Chat-GPT, could you please tell me why? (Use Enter plz)
+	// The reason the original code did not work properly is likely due to the order of byte reading.
+	// In the original code, the high byte and low byte were read sequentially without storing them first, which can lead to incorrect values if the reading order is not maintained properly.
+	// By using an array and a pointer, we ensure that the bytes are stored in the correct order before combining them into a single int16_t value.
+	// This method reduces the risk of misreading the byte order.
     int16_t Ac[3];
     char *pAc = (char *)Ac;
     for (int i = 0; i < 6; i++) {
