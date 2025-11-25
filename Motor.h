@@ -16,14 +16,10 @@ enum MotorID {
     MotorLeft = 0, // Motor A
     MotorRight = 1 // Motor B 仅供参考别TM再用AB了
 };
-enum MotorDirection {
-    Forward = 0,
-    Backward = 1
-};
 
 // Function declarations
 void MotorSetup();
-void SetPWM(enum MotorID motor, enum MotorDirection direction, unsigned int pwm);
+void SetPWM(enum MotorID motor, signed int pwm);
 void MotorTest();
 
 #endif // MOTOR_H

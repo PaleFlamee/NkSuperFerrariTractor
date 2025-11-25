@@ -32,38 +32,44 @@ void MotorSetup() {
     pinMode(PWMA, OUTPUT);
     pinMode(PWMB, OUTPUT);
     pinMode(STBY, OUTPUT);
-    digitalWrite(AIN1, 0);// Stop motor Left
-    digitalWrite(AIN2, 0);
-    digitalWrite(BIN1, 0);// Stop motor Right
-    digitalWrite(BIN2, 0);
     digitalWrite(STBY, 1);// Enable motor
-    analogWrite(PWMA, 0);
-    analogWrite(PWMB, 0);
+    SetPWM(MotorLeft, 0);
+    SetPWM(MotorRight, 0);
   
     pinMode(Voltage,INPUT);
 }
 
 // God damn comment
-void SetPWM(enum MotorID motor, enum MotorDirection direction, unsigned int pwm){
-    if(motor == MotorLeft && direction == Forward)  {
+void SetPWM(enum MotorID motor, signed int pwm){
+    if (motor == MotorLeft && pwm == 0) {
+        digitalWrite(AIN1, 0);
+        digitalWrite(AIN2, 0);
+        analogWrite(PWMA, pwm);
+    }
+    else if (motor == MotorLeft && pwm > 0)  {
         digitalWrite(AIN1, 1);
         digitalWrite(AIN2, 0);
         analogWrite(PWMA, pwm);
     }
-    else if(motor == MotorLeft && direction == Backward)  {
+    else if (motor == MotorLeft && pwm < 0)  {
         digitalWrite(AIN1, 0);
         digitalWrite(AIN2, 1);
-        analogWrite(PWMA, pwm);
+        analogWrite(PWMA, -pwm);
     }
-    else if(motor == MotorRight && direction == Forward)  {
+    else if (motor == MotorRight && pwm == 0) {
+        digitalWrite(BIN1, 0);
+        digitalWrite(BIN2, 0);
+        analogWrite(PWMB, pwm);
+    }
+    else if (motor == MotorRight && pwm > 0)  {
         digitalWrite(BIN1, 1);
         digitalWrite(BIN2, 0);
         analogWrite(PWMB, pwm);
     }
-    else if(motor == MotorRight && direction == Backward)  {
+    else if (motor == MotorRight && pwm < 0)  {
         digitalWrite(BIN1, 0);
         digitalWrite(BIN2, 1);
-        analogWrite(PWMB, pwm);
+        analogWrite(PWMB, -pwm);
     }
 }
 
@@ -75,22 +81,22 @@ void MotorTest() {
     delay(1000);
 
     LogSerial.println("Left Motor Forward, 1/4 speed, 1s");
-    SetPWM(MotorLeft, Forward, 64);
+    SetPWM(MotorLeft, 64);
     delay(1000);
-    SetPWM(MotorLeft, Forward, 0);
+    SetPWM(MotorLeft, 0);
 
     LogSerial.println("Left Motor Backward, 1/4 speed, 1s");
-    SetPWM(MotorLeft, Backward, 64);
+    SetPWM(MotorLeft, -64);
     delay(1000);
-    SetPWM(MotorLeft, Backward, 0);
+    SetPWM(MotorLeft, 0);
 
     LogSerial.println("Right Motor Forward, 1/4 speed, 1s");
-    SetPWM(MotorRight, Forward, 64);
+    SetPWM(MotorRight, 64);
     delay(1000);
-    SetPWM(MotorRight, Forward, 0);
+    SetPWM(MotorRight, 0);
 
     LogSerial.println("Left Motor Backward, 1/4 speed, 1s");
-    SetPWM(MotorRight, Backward, 64);
+    SetPWM(MotorRight, -64);
     delay(1000);
-    SetPWM(MotorRight, Backward, 0);
+    SetPWM(MotorRight, 0);
 }
