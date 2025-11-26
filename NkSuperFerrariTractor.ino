@@ -1,78 +1,61 @@
-// NkSuperFerrariTractor.ino
-// To run on Arduino R3
-// 
-
 #include "NkSuperFerrariTractor.h"
-
-#ifdef IMU_SERIAL
- SoftwareSerial Softerial(2,6); // RX, TX
-#endif
-
+#include "Motor.h"
 #include "FetchData.h"
 #include "LightNSound.h"
-#include "Motor.h"
+#include "BalanceControl.h"  // 新增的直立控制头文件
 
-// Timers
-#define LASTMILLIS(MILLIS) lastMillis ## MILLIS
-#define TIMESUP(MILLIS) LASTMILLIS(MILLIS) - nowMilliis >= MILLIS
+// 全局变量
+struct IMUData imuData;       // IMU数据结构体
+struct LTMData ltmData;       // 循迹模块数据结构体
+bool isBalancing = false;     // 直立状态标志
 
 void setup() {
-    LogSerial.begin(9600);
-    LogSerial.println();
-    LogSerial.println("-------------------------");
-    LogSerial.print("Ciallo~(∠·ω< )⌒★ ");
-    #ifdef IMU_SERIAL
-     ImuSerial.begin(9600);
-    #endif
-    Wire.begin();
-    lightNSoundInit();
-    MotorSetup();
-    LogSerial.println("World!");
-    LogSerial.println("-------------------------");
-    delay(500);
+  // 初始化硬件
+  LogSerial.begin(9600);    // 日志串口初始化
+  MotorSetup();               // 电机驱动初始化
+  lightNSoundInit();          // 灯光蜂鸣器初始化
+  #ifndef IMU_SERIAL
+    Wire.begin();             // I2C初始化（用于IMU和循迹模块）
+  #endif
 
-    #ifdef DEBUG_LIGHT_SOUND
-     LogSerial.println("Light and Sound Test Start:");
-     lightNSoundTest();
-     LogSerial.println("Light and Sound Test End.");
-    #endif
-
-    #ifdef DEBUG_MOTOR
-     LogSerial.println("Motor Test Start:");
-     MotorTest();
-     LogSerial.println("Motor Test End.");
-    #endif
-    delay(500);
-    Light(true);
-    Sound(true);
-    delay(300);
-    Light(false);
-    Sound(false);
+  // 系统自检
+  lightNSoundTest();          // 灯光蜂鸣器测试
+  //MotorTest();                // 电机测试（短暂运行后停止）
+  
+  // 等待IMU初始化完成
+  delay(1000);
+  LogSerial.println("System initialized. Ready to balance.");
+  
+  // 启动直立控制
+  isBalancing = true;
+  Light(true);  // 点亮LED表示系统启动
 }
 
-void loop(){
-    static unsigned long LASTMILLIS(100) = 0, LASTMILLIS(500) = 0;
-    unsigned long nowMilliis = millis();
-
-    struct IMUData imuData;
-    struct LTMData ltmData;
-
-    if(TIMESUP(100)){
-        LASTMILLIS(100) = nowMilliis;
-        // TODO: Add codes here
-    }
-    #ifdef DEBUG
-     if(TIMESUP(500)){// For testing purposes
-        LASTMILLIS(500) = nowMilliis;
-        #ifdef DEBUG_IMU
-         #ifndef IMU_SERIAL
-          fetchIMUData(&imuData);
-         #endif
-        #endif
-        #ifdef DEBUG_LTM
-         fetchLTMData(&ltmData);
-        #endif
-        LogSerial.println();
-     }
+void loop() {
+  if (isBalancing) {
+    // 获取传感器数据
+    #ifdef IMU_SERIAL
+      // 串口模式下IMU数据通过serialEvent自动更新
+    #else
+      fetchIMUData(&imuData);  // I2C模式下主动获取IMU数据
     #endif
+    fetchLTMData(&ltmData);    // 获取循迹传感器数据（可选，用于扩展功能）
+
+    // 执行直立控制
+    balanceControl(&imuData);  // 传入IMU数据进行直立控制
+
+    // 角度超限保护（防止翻车后持续输出）
+    float currentAngle = getCurrentAngle(&imuData);
+    if (abs(currentAngle) > ANGLE_LIMIT) {
+      stopMotors();            // 超过安全角度则停止电机
+      isBalancing = false;
+      Sound(true);             // 蜂鸣器报警
+      delay(1000);
+      Sound(false);
+      LogSerial.println("Angle out of limit. Balance stopped.");
+    }
+  } else {
+    // 等待重新启动（可通过串口指令扩展）
+    delay(100);
+  }
 }
