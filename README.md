@@ -16,7 +16,7 @@
 `ATmega168`拥有`Timer0` `Timer1` `Timer2`三个硬件定时器  
 
 `Timer0`提供的`millis()`用于创建软件定时器
-`Timer1`拥有最高的精度，用于PID和IMU/LTM数据的更新  
+`Timer1`拥有最高的精度，用于PID~~和IMU/LTM数据的更新~~(ISR和IIC不能共存-不允许嵌套中断)  
 `Timer2`用于产生PWM信号  
 
 以上均通过全局变量沟通
@@ -33,14 +33,14 @@
 
 ### 3.代码
 `.h`头文件与`.cpp`源文件成对出现，`.h`文件包含仅在相应的`.cpp`文件中出现的宏/函数/类型声明，`.cpp`文件包含具体的定义  
-`NkSuperFerrariTractor.ino`是主要的源文件，包含`setup()` `loop()` `Timer1_ISR()`三个核心函数和`IMUData` `LTMData` `Title` `currentMode` `currentStage`全局变量  
+`NkSuperFerrariTractor.ino`是主要的源文件，包含`setup()` `loop()` `Timer1_ISR()`三个核心函数和`IMUData` `LTMData` `currentOperation`全局变量  
 `NkSuperFerrariTractor.h`是主要的头文件，包含以上的声明和编译开关
 
-所有其他源文件都应该包含对应的头文件和`NkSuperFerrariTractor.h`  
+所有其他源文件都应该包含对应的头文件，所需的标准库文件，和`NkSuperFerrariTractor.h`  
 |文件|作用|
 |---|---|
 |LightNSound||
 |Motor||
 |FetchData||
-|PID||
+|BalanceControl||
 |||
