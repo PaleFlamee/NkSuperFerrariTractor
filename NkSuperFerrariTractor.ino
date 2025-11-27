@@ -196,13 +196,13 @@ void Timer1_ISR() {
       stopMotors();            // 超过安全角度则停止电机
       isBalancing = false;
       Sound(true);             // 蜂鸣器报警
-      delay(1000);
+      delay(1000);  //////////////////////////////////////////////////////////不要用delay啊啊啊啊啊啊啊啊啊啊
       Sound(false);
       LogSerial.println("Angle out of limit. Balance stopped.");
     }
   } else {
     // 等待重新启动（可通过串口指令扩展）
-    delay(100);
+    delay(100);////////////////////////////////////////////////////////////////////////////////////////////
   }
 }
 
