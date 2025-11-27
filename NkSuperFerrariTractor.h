@@ -10,16 +10,14 @@
   //#define DEBUG_LIGHT_SOUND /*ADJUSTABLE*/
 #endif
 
-// JY61P IIC / Serial selection
-// #define IMU_SERIAL /*ADJUSTABLE*/ //DO NOT ENABLE THIS UNLESS YOU KNOW WHAT YOU ARE DOING
-#ifdef IMU_SERIAL
- #define LogSerial Softerial
- #define ImuSerial Serial
- #include <SoftwareSerial.h>
- extern SoftwareSerial LogSerial;
-#else
- #define LogSerial Serial
-#endif
+// When using PLAN A, that is, using Serial RX to receive IMU data,
+// at the same time, Serial TX cannot be used for debugging output.
+// I am a god damn genius.
+#define LogSerial Serial // TX only
+//#define IMUSerial Serial // RX only /*ADJUSTABLE*/
+// BTW, the PLAN B is to change into a brand new IMU with I2C interface.
+
+
 
 #include <Arduino.h>
 #include <hardwareSerial.h>
@@ -48,11 +46,22 @@ struct LTMData {
     bool ir[8]; 
 };
 
+enum OperationMode {
+    Stop,
+    FollowLine,
+    FollowInertia,
+    FollowInertiaReverse
+};
 
+struct LocationData {
+    float x; // Unit: m
+    float y; // Unit: m
+};
 
+struct Title{
+    enum OperationMode Operations[9];
+};
 
-
-
-
+extern enum OperationMode currentOperation;
 
 #endif

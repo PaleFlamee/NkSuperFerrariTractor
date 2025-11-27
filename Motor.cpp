@@ -9,7 +9,7 @@
 // STBY             7
 // BIN1             8
 // BIN2             9
-// PWMB             10
+// PWMB             10 要换成11
 // 5V
 // GND
 // ADC              A0
@@ -95,7 +95,7 @@ void MotorTest() {
     delay(1000);
     SetPWM(MotorRight, 0);
 
-    LogSerial.println("Left Motor Backward, 1/4 speed, 1s");
+    LogSerial.println("Right Motor Backward, 1/4 speed, 1s");
     SetPWM(MotorRight, -64);
     delay(1000);
     SetPWM(MotorRight, 0);

@@ -1,91 +1,9 @@
 #include "NkSuperFerrariTractor.h"
 
 #include "FetchData.h"
-
-#ifdef IMU_SERIAL
-
-struct IMUData imuDataSerial;
-
-
-void CopeSerialData(unsigned char ucData){
-	static unsigned char ucRxBuffer[250];
-	static unsigned char ucRxCnt = 0;	
-	
-	ucRxBuffer[ucRxCnt++]=ucData;
-	if (ucRxBuffer[0]!=0x55) 
-	{
-		ucRxCnt=0;
-		return;
-	}
-	if (ucRxCnt<11) {return;}
-	else
-	{
-        struct SAcc{
-            short a[3];
-        }sacc;
-        struct SGyro{
-            short w[3];
-        }sgyro;
-        struct SAngle{
-            short Angle[3];
-        }sangle;
-
-		switch(ucRxBuffer[1]){
-			case 0x50:	break;
-			case 0x51:	memcpy(&sacc.a,&ucRxBuffer[2],8);break;
-			case 0x52:	memcpy(&sgyro.w,&ucRxBuffer[2],8);break;
-			case 0x53:	memcpy(&sangle.Angle,&ucRxBuffer[2],8);break;
-			case 0x54:	break;
-			case 0x55:	break;
-			case 0x56:	break;
-			case 0x57:	break;
-			case 0x58:	break;
-		}
-
-        imuDataSerial.accelX = (float)sacc.a[0] / 32768 * 16; // Unit: g
-        imuDataSerial.accelY = (float)sacc.a[1] / 32768 * 16; // Unit: g
-        imuDataSerial.accelZ = (float)sacc.a[2] / 32768 * 16; // Unit: g
-        imuDataSerial.gyroX = (float)sgyro.w[0] / 32768 * 2000; // Unit: °/s
-        imuDataSerial.gyroY = (float)sgyro.w[1] / 32768 * 2000; // Unit: °/s
-        imuDataSerial.gyroZ = (float)sgyro.w[2] / 32768 * 2000; // Unit: °/s
-        imuDataSerial.Row = (float)sangle.Angle[0] / 32768 * 180; // Unit: °
-        imuDataSerial.Pitch = (float)sangle.Angle[1] / 32768 * 180; // Unit: °
-        imuDataSerial.Yaw = (float)sangle.Angle[2] / 32768 * 180; // Unit: °
-
-		ucRxCnt=0;
-	}
-}
-
-void serialEvent(){// Hardware serial, also IMU serial
-    while (ImuSerial.available()) 
-    {
-        CopeSerialData(ImuSerial.read()); //Call JY901 data cope function
-    }
-    #ifdef DEBUG_IMU
-    char buf[16];
-    dtostrf(imuDataSerial.accelX, 8, 4, buf);
-    LogSerial.print("AX: ");LogSerial.print(buf);LogSerial.print(" | ");
-    dtostrf(imuDataSerial.accelY, 8, 4, buf);
-    LogSerial.print("AY: ");LogSerial.print(buf);LogSerial.print(" | ");
-    dtostrf(imuDataSerial.accelZ, 8, 4, buf);
-    LogSerial.print("AZ: ");LogSerial.print(buf);LogSerial.print(" | ");
-    dtostrf(imuDataSerial.gyroX, 8, 2, buf);
-    LogSerial.print("GX: ");LogSerial.print(buf);LogSerial.print(" | ");
-    dtostrf(imuDataSerial.gyroY, 8, 2, buf);
-    LogSerial.print("GY: ");LogSerial.print(buf);LogSerial.print(" | ");
-    dtostrf(imuDataSerial.gyroZ, 8, 2, buf);
-    LogSerial.print("GZ: ");LogSerial.print(buf);LogSerial.print(" | ");
-    dtostrf(imuDataSerial.Row, 8, 2, buf);
-    LogSerial.print("Roll: ");LogSerial.print(buf);LogSerial.print(" | ");
-    dtostrf(imuDataSerial.Pitch, 8, 2, buf);
-    LogSerial.print("Pitch: ");LogSerial.print(buf);LogSerial.print(" | ");
-    dtostrf(imuDataSerial.Yaw, 8, 2, buf);
-    LogSerial.print("Yaw: ");LogSerial.print(buf);LogSerial.println();
-    #endif
-}
-
-#else
- void fetchIMUData(struct IMUData *pData) {
+#ifndef IMUSerial
+#ifdef JY61P
+void fetchIMUData(struct IMUData *pData) {
     Wire.beginTransmission(IMU);
     Wire.write(IMU_ACC_X_REG);
     Wire.endTransmission(false);
@@ -169,8 +87,58 @@ void serialEvent(){// Hardware serial, also IMU serial
     dtostrf(pData->Yaw, 7, 2, buf);
     LogSerial.print("Yaw: ");LogSerial.print(buf);LogSerial.print(" | ");
     #endif
- }
+}
 #endif
+#ifdef MPU6050
+void fetchIMUData(struct IMUData *pData) {
+}
+#endif
+#ifdef NEWIMU
+void fetchIMUData(struct IMUData *pData) {
+}
+#endif
+#else
+
+CJY901 JY901;
+void CJY901 ::CopeSerialData(unsigned char ucData){
+	static unsigned char ucRxBuffer[250];
+	static unsigned char ucRxCnt = 0;	
+	
+	ucRxBuffer[ucRxCnt++]=ucData;
+	if (ucRxBuffer[0]!=0x55) {
+		ucRxCnt=0;
+		return;
+	}
+	if (ucRxCnt<11) {return;}
+	else {
+		switch(ucRxBuffer[1]){
+			case 0x51:	memcpy(&stcAcc,&ucRxBuffer[2],8);break;
+			case 0x52:	memcpy(&stcGyro,&ucRxBuffer[2],8);break;
+			case 0x53:	memcpy(&stcAngle,&ucRxBuffer[2],8);break;
+			default:	break;
+		}
+		ucRxCnt=0;
+	}
+}
+void serialEvent() {
+    while (IMUSerial.available()) {
+        JY901.CopeSerialData(IMUSerial.read()); //Call JY901 data cope function
+        LogSerial.print("Acc:");LogSerial.print((float)JY901.stcAcc.a[0]/32768*16);LogSerial.print(" ");LogSerial.print((float)JY901.stcAcc.a[1]/32768*16);LogSerial.print(" ");LogSerial.println((float)JY901.stcAcc.a[2]/32768*16);
+  
+        LogSerial.print("Gyro:");LogSerial.print((float)JY901.stcGyro.w[0]/32768*2000);LogSerial.print(" ");LogSerial.print((float)JY901.stcGyro.w[1]/32768*2000);LogSerial.print(" ");LogSerial.println((float)JY901.stcGyro.w[2]/32768*2000);
+  
+        LogSerial.print("Angle:");LogSerial.print((float)JY901.stcAngle.Angle[0]/32768*180);LogSerial.print(" ");LogSerial.print((float)JY901.stcAngle.Angle[1]/32768*180);LogSerial.print(" ");LogSerial.println((float)JY901.stcAngle.Angle[2]/32768*180);
+    }
+}
+
+
+void fetchIMUData(struct IMUData *pData) {
+    // Just a placeholder when using Serial IMU
+    // Because IMUData is fetched in Serial Interrupt Handler function
+}
+#endif
+
+
 
 void fetchLTMData(struct LTMData *pData) {
     Wire.beginTransmission(LTM);
