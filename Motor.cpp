@@ -9,14 +9,14 @@
 // STBY             7
 // BIN1             8
 // BIN2             9
-// PWMB             10 要换成11
+// PWMB             11
 // 5V
-// GND
-// ADC              A0
-// E1A
-// E1B
-// E2A
-// E2B
+// GND              
+// ADC              
+// E1A              A1
+// E1B              A2
+// E2A              A3
+// E2B              A4
 
 // IN1   IN2
 //  0     0   Stop
@@ -32,11 +32,15 @@ void MotorSetup() {
     pinMode(PWMA, OUTPUT);
     pinMode(PWMB, OUTPUT);
     pinMode(STBY, OUTPUT);
+    pinMode(E1A, OUTPUT);
+    pinMode(E1B, OUTPUT);
+    pinMode(E2A, OUTPUT);
+    pinMode(E2B, OUTPUT);
     digitalWrite(STBY, 1);// Enable motor
     SetPWM(MotorLeft, 0);
     SetPWM(MotorRight, 0);
   
-    pinMode(Voltage,INPUT);
+    // pinMode(Voltage,INPUT);
 }
 
 // God damn comment
@@ -74,11 +78,11 @@ void SetPWM(enum MotorID motor, signed int pwm){
 }
 
 void MotorTest() {
-    double V = analogRead(Voltage);
-    LogSerial.print("Battery Voltage: ");
-    LogSerial.print(V * 0.05371);
-    LogSerial.println("V");
-    delay(1000);
+    // double V = analogRead(Voltage);
+    // LogSerial.print("Battery Voltage: ");
+    // LogSerial.print(V * 0.05371);
+    // LogSerial.println("V");
+    // delay(1000);
 
     LogSerial.println("Left Motor Forward, 1/4 speed, 1s");
     SetPWM(MotorLeft, 64);

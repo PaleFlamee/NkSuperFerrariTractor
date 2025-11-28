@@ -8,8 +8,13 @@
 #define STBY 7
 #define BIN1 8
 #define BIN2 9
-#define PWMB 10
-#define Voltage A0 // Battery voltage reading pin, analog input
+#define PWMB 11
+
+#define E1A A1
+#define E1B A2
+#define E2A A3
+#define E2B A4
+// #define Voltage A0 // Battery voltage reading pin, analog input
 
 // Motor identifiers
 enum MotorID {

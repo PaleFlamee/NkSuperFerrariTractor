@@ -95,6 +95,72 @@ void fetchIMUData(struct IMUData *pData) {
 #endif
 #ifdef NEWIMU
 void fetchIMUData(struct IMUData *pData) {
+    Wire.beginTransmission(0x23);
+    Wire.write(0x04); // Starting register for Accel Readings
+    Wire.endTransmission(false);
+    Wire.requestFrom(0x23, 6, true); // Request 6 bytes for Acceleration
+    int16_t Raw[3];
+    uint8_t low;
+    uint8_t high;
+    for (int i = 0; i < 6; i++) {
+        uint8_t low = Wire.read();
+        uint8_t high = Wire.read();
+        Raw[i] = (int16_t)((high << 8) | low);
+    }
+    pData->accelX = (float)Raw[0] * 16.0 / 32767.0; // Unit: g
+    pData->accelY = (float)Raw[1] * 16.0 / 32767.0; // Unit: g
+    pData->accelZ = (float)Raw[2] * 16.0 / 32767.0; // Unit: g
+
+    Wire.beginTransmission(0x23);
+    Wire.write(0x0A); // Starting register for Gyro Readings
+    Wire.endTransmission(false);
+    Wire.requestFrom(0x23, 6, true); // Request 6 bytes for Gyroscope
+    for (int i = 0; i < 6; i++) {
+        uint8_t low = Wire.read();
+        uint8_t high = Wire.read();
+        Raw[i] = (int16_t)((high << 8) | low);
+    }
+    pData->gyroX = (float)Raw[0] * 2000.0 / 32767.0; // Unit: °/s
+    pData->gyroY = (float)Raw[1] * 2000.0 / 32767.0; // Unit: °/s
+    pData->gyroZ = (float)Raw[2] * 2000.0 / 32767.0; // Unit: °/s
+
+    Wire.beginTransmission(0x23);
+    Wire.write(0x26); // Starting register for Roll, Pitch, Yaw Read
+    Wire.endTransmission(false);
+    Wire.requestFrom(0x23, 12, true); // Request 12 bytes for Roll, Pitch, Yaw
+    union {
+        float value;
+        uint8_t bytes[4];
+    } eulerRaw[3];
+    for (int i = 0; i < 3; i++) {
+        for (int j = 0; j < 4; j++) {
+            eulerRaw[i].bytes[j] = Wire.read();
+        }
+        pData->Row = eulerRaw[0].value * 180.0 / 3.14159;   // Unit: °
+        pData->Pitch = eulerRaw[1].value * 180.0 / 3.14159; // Unit: °
+        pData->Yaw = eulerRaw[2].value * 180.0 / 3.14159;   // Unit: °
+    }
+    #ifdef DEBUG_IMU
+    char buf[16];
+    dtostrf(pData->accelX, 8, 4, buf);
+    LogSerial.print("AX: ");LogSerial.print(buf);LogSerial.print(" | ");
+    dtostrf(pData->accelY, 8, 4, buf);
+    LogSerial.print("AY: ");LogSerial.print(buf);LogSerial.print(" | ");
+    dtostrf(pData->accelZ, 8, 4, buf);
+    LogSerial.print("AZ: ");LogSerial.print(buf);LogSerial.print(" | ");
+    dtostrf(pData->gyroX, 8, 2, buf);
+    LogSerial.print("GX: ");LogSerial.print(buf);LogSerial.print(" | ");
+    dtostrf(pData->gyroY, 8, 2, buf);
+    LogSerial.print("GY: ");LogSerial.print(buf);LogSerial.print(" | ");
+    dtostrf(pData->gyroZ, 8, 2, buf);
+    LogSerial.print("GZ: ");LogSerial.print(buf);LogSerial.print(" | ");
+    dtostrf(pData->Row, 7, 2, buf);
+    LogSerial.print("Roll: ");LogSerial.print(buf);LogSerial.print(" | ");
+    dtostrf(pData->Pitch, 7, 2, buf);
+    LogSerial.print("Pitch: ");LogSerial.print(buf);LogSerial.print(" | ");
+    dtostrf(pData->Yaw, 7, 2, buf);
+    LogSerial.print("Yaw: ");LogSerial.print(buf);LogSerial.print(" | ");
+    #endif
 }
 #endif
 #else

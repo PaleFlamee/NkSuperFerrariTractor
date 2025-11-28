@@ -6,7 +6,7 @@
 
 
 // Timer1 for PID
-#include <MsTimer1.h>
+#include <TimerOne.h>
 // Timer0 is used for delay, millis
 // Timer2 for PWM motor control
 
@@ -15,8 +15,8 @@
 #define TIMESUP(MILLIS) nowMillis - LASTMILLIS(MILLIS) >= MILLIS
 
 // Pin definitions for title selection
-#define SWITCH_PIN_1  //上拉电阻，开关连接到GND
-#define SWITCH_PIN_2  //上拉电阻，开关连接到GND
+#define SWITCH_PIN_1  A0//上拉电阻，开关连接到GND
+#define SWITCH_PIN_2  A5//上拉电阻，开关连接到GND
 
 
 struct IMUData imuData;
@@ -30,7 +30,7 @@ const struct Title title[4]={{{FollowInertia,Stop}},
     {{FollowInertia,FollowLine,FollowInertia,FollowLine,Stop}},
     {{FollowInertia,FollowLine,FollowInertia,FollowLine,FollowInertia,FollowLine,FollowInertia,FollowLine,Stop}}};
 int currentTitleIndex;
-int currentOperationIndex = 0;
+int currentOperationIndex;
 enum OperationMode currentOperation = Stop;
 
 void setup() {
@@ -41,8 +41,10 @@ void setup() {
     Wire.begin();
     lightNSoundInit();
     MotorSetup();
-    MsTimer1::set(10, Timer1_ISR); // 10ms interrupt
-    MsTimer1::start();
+    // Timer1, 微秒级别的定时器，开心吗
+    class TimerOne Timer1;
+    Timer1.initialize(10000);// 10000us = 10ms
+    Timer1.attachInterrupt(Timer1_ISR);
     LogSerial.println("World!");
     LogSerial.println("-------------------------");
 
@@ -60,17 +62,19 @@ void setup() {
     pinMode(SWITCH_PIN_1, INPUT_PULLUP);
     pinMode(SWITCH_PIN_2, INPUT_PULLUP);
     // Determine current title based on switch positions
-    bool switch1State = digitalRead(SWITCH_PIN_1);
-    bool switch2State = digitalRead(SWITCH_PIN_2);
-    if (!switch1State && !switch2State) {
-        currentTitleIndex = 0;// 第一题 
-    } else if (!switch1State && switch2State) {
-        currentTitleIndex = 1;// 第二题
-    } else if (switch1State && !switch2State) {
-        currentTitleIndex = 2;// 第三题
-    } else {
-        currentTitleIndex = 3;// 第四题
-    }
+    // bool switch1State = digitalRead(SWITCH_PIN_1);
+    // bool switch2State = digitalRead(SWITCH_PIN_2);
+    // if (!switch1State && !switch2State) {
+    //     currentTitleIndex = 0;// 第一题 
+    // } else if (!switch1State && switch2State) {
+    //     currentTitleIndex = 1;// 第二题
+    // } else if (switch1State && !switch2State) {
+    //     currentTitleIndex = 2;// 第三题
+    // } else {
+    //     currentTitleIndex = 3;// 第四题
+    // }
+    currentTitleIndex = 3;// 暂时写死为第四题，方便调试
+    currentOperationIndex = 0;
 }
 
 void loop(){
@@ -163,7 +167,7 @@ void loop(){
          fetchIMUData(&imuData);
         #endif
         #ifdef DEBUG_LTM
-         //fetchLTMData(&ltmData);
+         fetchLTMData(&ltmData);
         #endif
         LogSerial.println();
      }
@@ -181,28 +185,28 @@ void loop(){
     }
 }
 
-// Timer1 Interrupt Service Routine
+//Timer1 Interrupt Service Routine
 void Timer1_ISR() {
-    // 全局变量currentOperation决定当前的PID操作模式
+//     // 全局变量currentOperation决定当前的PID操作模式
     
-  if (isBalancing) {
+//   if (isBalancing) {
 
-    // 执行直立控制
-    balanceControl(&imuData);  // 传入IMU数据进行直立控制
+//     // 执行直立控制
+//     balanceControl(&imuData);  // 传入IMU数据进行直立控制
 
-    // 角度超限保护（防止翻车后持续输出）
-    float currentAngle = getCurrentAngle(&imuData);
-    if (abs(currentAngle) > ANGLE_LIMIT) {
-      stopMotors();            // 超过安全角度则停止电机
-      isBalancing = false;
-      Sound(true);             // 蜂鸣器报警
-      delay(1000);  //////////////////////////////////////////////////////////不要用delay啊啊啊啊啊啊啊啊啊啊
-      Sound(false);
-      LogSerial.println("Angle out of limit. Balance stopped.");
-    }
-  } else {
-    // 等待重新启动（可通过串口指令扩展）
-    delay(100);////////////////////////////////////////////////////////////////////////////////////////////
-  }
+//     // 角度超限保护（防止翻车后持续输出）
+//     float currentAngle = getCurrentAngle(&imuData);
+//     if (abs(currentAngle) > ANGLE_LIMIT) {
+//       stopMotors();            // 超过安全角度则停止电机
+//       isBalancing = false;
+//       Sound(true);             // 蜂鸣器报警
+//       delay(1000);  //////////////////////////////////////////////////////////不要用delay啊啊啊啊啊啊啊啊啊啊
+//       Sound(false);
+//       LogSerial.println("Angle out of limit. Balance stopped.");
+//     }
+//   } else {
+//     // 等待重新启动（可通过串口指令扩展）
+//     delay(100);////////////////////////////////////////////////////////////////////////////////////////////
+//   }
 }
 
