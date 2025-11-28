@@ -187,26 +187,6 @@ void loop(){
 
 //Timer1 Interrupt Service Routine
 void Timer1_ISR() {
-//     // 全局变量currentOperation决定当前的PID操作模式
-    
-//   if (isBalancing) {
 
-//     // 执行直立控制
-//     balanceControl(&imuData);  // 传入IMU数据进行直立控制
-
-//     // 角度超限保护（防止翻车后持续输出）
-//     float currentAngle = getCurrentAngle(&imuData);
-//     if (abs(currentAngle) > ANGLE_LIMIT) {
-//       stopMotors();            // 超过安全角度则停止电机
-//       isBalancing = false;
-//       Sound(true);             // 蜂鸣器报警
-//       delay(1000);  //////////////////////////////////////////////////////////不要用delay啊啊啊啊啊啊啊啊啊啊
-//       Sound(false);
-//       LogSerial.println("Angle out of limit. Balance stopped.");
-//     }
-//   } else {
-//     // 等待重新启动（可通过串口指令扩展）
-//     delay(100);////////////////////////////////////////////////////////////////////////////////////////////
-//   }
 }
 
