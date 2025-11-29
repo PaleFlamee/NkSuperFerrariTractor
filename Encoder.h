@@ -3,7 +3,7 @@
 
 #include "NkSuperFerrariTractor.h"
 
-// 编码器引脚定义（对应Motor.h的E1A/E1B/E2A/E2B）
+// 编码器引脚定义（对应Motor.h）
 #define ENCODER_LEFT_A A1
 #define ENCODER_LEFT_B A2
 #define ENCODER_RIGHT_A A3
@@ -26,4 +26,5 @@ void CalculateEncoderSpeed(struct EncoderData *pData, float sampleTime);
 extern struct EncoderData encoderData;
 
 #endif
+
 
