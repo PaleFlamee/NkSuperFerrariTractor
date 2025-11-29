@@ -2,9 +2,8 @@
 #define BALANCE_CONTROL_H
 
 #include "NkSuperFerrariTractor.h"
-#include "IMUData.h"
-#include "EncoderData.h"
-#include "LTMData.h"
+#include "FetchData"
+#include "Encoder.h"
 
 // PID参数结构体
 struct PIDParams {
@@ -27,3 +26,4 @@ extern struct PIDParams speedPID;
 extern struct PIDParams steerPID;
 
 #endif
+
