@@ -63,5 +63,6 @@ struct Title{
 };
 
 extern enum OperationMode currentOperation;
+extern int initialYaw;
 
 #endif

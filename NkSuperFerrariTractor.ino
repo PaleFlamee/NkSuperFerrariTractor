@@ -21,6 +21,7 @@
 
 struct IMUData imuData;
 struct LTMData ltmData;
+int initialYaw = 0;
 bool isBalancing = true;     // 直立状态标志
 //enum OperationMode currentMode = Stop;
 
@@ -41,12 +42,19 @@ void setup() {
     Wire.begin();
     lightNSoundInit();
     MotorSetup();
+
     // Timer1, 微秒级别的定时器，开心吗
     class TimerOne Timer1;
     Timer1.initialize(10000);// 10000us = 10ms
     Timer1.attachInterrupt(Timer1_ISR);
+
+    delay(5000); // Wait for IMU initialization
+    imuData = fetchIMUData(&imuData);
+    initialYaw = imuData.yaw; // Initial yaw for inertial following
+
     LogSerial.println("World!");
     LogSerial.println("-------------------------");
+
 
     #ifdef DEBUG_LIGHT_SOUND
      LogSerial.println("Light and Sound Test Start:");

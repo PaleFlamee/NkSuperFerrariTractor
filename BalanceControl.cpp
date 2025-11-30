@@ -62,6 +62,11 @@ void BalanceControl(struct IMUData *imu, struct EncoderData *encoder, struct LTM
   }
   speedOutput = PIDCalculate(&speedPID, speedSet, avgSpeed, 0.01);
 
+  /*!!!! 这里缺一个根据initialYaw和imu->Yaw调整转向环PID的逻辑 !!!!*/
+
+
+
+
   // 3. 转向环PID（基于循迹传感器）
   int lineError = 0;
   if(mode == FollowLine) {
