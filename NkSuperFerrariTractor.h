@@ -7,7 +7,7 @@
   #define DEBUG_IMU /*ADJUSTABLE*/
   #define DEBUG_LTM /*ADJUSTABLE*/
   //#define DEBUG_MOTOR /*ADJUSTABLE*/
-  //#define DEBUG_LIGHT_SOUND /*ADJUSTABLE*/
+  #define DEBUG_LIGHT_SOUND /*ADJUSTABLE*/
 #endif
 
 // When using PLAN A, that is, using Serial RX to receive IMU data,
