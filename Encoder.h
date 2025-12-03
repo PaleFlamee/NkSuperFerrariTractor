@@ -4,10 +4,14 @@
 #include "NkSuperFerrariTractor.h"
 
 // 编码器引脚定义（对应Motor.h）
-#define ENCODER_LEFT_A A1
-#define ENCODER_LEFT_B A2
-#define ENCODER_RIGHT_A A3
-#define ENCODER_RIGHT_B A4
+// #define ENCODER_LEFT_A A1
+// #define ENCODER_LEFT_B A2
+// #define ENCODER_RIGHT_A A3
+// #define ENCODER_RIGHT_B A4
+#define ENCODER_LEFT_A 34
+#define ENCODER_LEFT_B 35
+#define ENCODER_RIGHT_A 36
+#define ENCODER_RIGHT_B 39
 
 // 编码器数据结构
 struct EncoderData {

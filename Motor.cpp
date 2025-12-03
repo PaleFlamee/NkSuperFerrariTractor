@@ -32,10 +32,6 @@ void MotorSetup() {
     pinMode(PWMA, OUTPUT);
     pinMode(PWMB, OUTPUT);
     pinMode(STBY, OUTPUT);
-    pinMode(E1A, OUTPUT);
-    pinMode(E1B, OUTPUT);
-    pinMode(E2A, OUTPUT);
-    pinMode(E2B, OUTPUT);
     digitalWrite(STBY, 1);// Enable motor
     SetPWM(MotorLeft, 0);
     SetPWM(MotorRight, 0);

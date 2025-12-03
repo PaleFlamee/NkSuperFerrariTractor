@@ -102,28 +102,26 @@ void fetchIMUData(struct IMUData *pData) {
     int16_t Raw[3];
     uint8_t low;
     uint8_t high;
-    for (int i = 0; i < 6; i++) {
-        uint8_t low = Wire.read();
-        uint8_t high = Wire.read();
+    for (int i = 0; i < 3; i++) {
+        low = Wire.read();
+        high = Wire.read();
         Raw[i] = (int16_t)((high << 8) | low);
     }
     pData->accelX = (float)Raw[0] * 16.0 / 32767.0; // Unit: g
     pData->accelY = (float)Raw[1] * 16.0 / 32767.0; // Unit: g
     pData->accelZ = (float)Raw[2] * 16.0 / 32767.0; // Unit: g
-
     Wire.beginTransmission(0x23);
     Wire.write(0x0A); // Starting register for Gyro Readings
     Wire.endTransmission(false);
-    Wire.requestFrom(0x23, 6, true); // Request 6 bytes for Gyroscope
-    for (int i = 0; i < 6; i++) {
-        uint8_t low = Wire.read();
-        uint8_t high = Wire.read();
+    Wire.requestFrom(0x23, 3, true); // Request 6 bytes for Gyroscope
+    for (int i = 0; i < 3; i++) {
+        low = Wire.read();
+        high = Wire.read();
         Raw[i] = (int16_t)((high << 8) | low);
     }
     pData->gyroX = (float)Raw[0] * 2000.0 / 32767.0; // Unit: °/s
     pData->gyroY = (float)Raw[1] * 2000.0 / 32767.0; // Unit: °/s
     pData->gyroZ = (float)Raw[2] * 2000.0 / 32767.0; // Unit: °/s
-
     Wire.beginTransmission(0x23);
     Wire.write(0x26); // Starting register for Roll, Pitch, Yaw Read
     Wire.endTransmission(false);
